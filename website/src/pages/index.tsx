@@ -1,10 +1,18 @@
-import React from "react";
+/* eslint-disable filenames/match-exported */
+import BrowserOnly from "@docusaurus/BrowserOnly";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import Layout from "@theme/Layout";
-import * as icons from "../icons";
+import React, { Suspense } from "react";
 
 import styles from "./index.module.css";
+import * as icons from "../icons";
+
+// Async import is needed to avoid errors from WASM loading during Docusaurus build.
+const McapRecordingDemo = React.lazy(async () => ({
+  default: (await import("../components/McapRecordingDemo/McapRecordingDemo"))
+    .McapRecordingDemo,
+}));
 
 type FeatureItem = {
   title: string;
@@ -14,29 +22,29 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: "Pub/Sub logging",
+    title: "Pub/sub logging",
     Icon: icons.Robot,
     description:
-      "MCAP is ideal for storing multiple channels of timestamped log data, such as pub/sub messages or multimodal sensor data.",
+      "Store multiple channels of timestamped log data, such as pub/sub messages or multimodal sensor data.",
   },
 
   {
-    title: "Serialization agnostic",
+    title: "Serialization-agnostic",
     Icon: icons.DrawerEnvelope,
     description:
-      "MCAP is a container format, allowing you to record and replay binary messages in any format, such as Protobuf, DDS (CDR), ROS, JSON, etc.",
+      "Record and replay binary messages in any format – like Protobuf, DDS (CDR), ROS, JSON, and more.",
   },
   {
     title: "High-performance writing",
     Icon: icons.SportsCarConvertible,
     description:
-      "MCAP utilizes a row-oriented, append-only design. This minimizes disk I/O, and reduces the risk of data corruption during an unclean shutdown. ",
+      "MCAP uses a row-oriented, append-only design to minimize disk I/O and reduce the risk of data corruption during unclean shutdowns.",
   },
   {
     title: "Self-contained",
     Icon: icons.ShipmentPackage,
     description:
-      "MCAP files are fully self-contained, including schemas required to deserialize each channel. Older files always remain readable, even as your codebase evolves.",
+      "MCAP stores message schemas alongside data, so your files remain readable in the future even as your codebase evolves.",
   },
   {
     title: "Efficient seeking",
@@ -48,22 +56,22 @@ const FeatureList: FeatureItem[] = [
     title: "Optional compression",
     Icon: icons.ZipFile,
     description:
-      "Data can be compressed using lz4 or zstd, while still supporting efficient indexed reads using chunk-based decompression.",
+      "Choose between LZ4 or Zstandard for chunk-based compression, while still supporting efficient indexed reads.",
   },
   {
-    title: "Multilingual",
+    title: "Broad language support",
     Icon: icons.ChatTranslate,
     description:
-      "MCAP reader and writer libraries are available in many languages, including C++, Go, Python, Rust, Swift, and Typescript.",
+      "Native reader and writer libraries are available in C++, Go, Python, Rust, Swift, and TypeScript.",
   },
   {
     title: "Flexible",
     Icon: icons.YogaLegGrabStretch,
     description:
-      "Features such as chunking, indexing, CRC checksums, and compression are optional. You choose the right tradeoffs for your application.",
+      "Configure optional features like chunking, indexing, CRC checksums, and compression to make the right tradeoffs for your application.",
   },
   {
-    title: "Production grade",
+    title: "Production-grade",
     Icon: icons.ArmyWoman1,
     description:
       "MCAP is used in production by a wide range of companies, from autonomous vehicles to drones, and is the default log format in ROS 2.",
@@ -72,7 +80,7 @@ const FeatureList: FeatureItem[] = [
 
 function Feature({ title, Icon, description }: FeatureItem) {
   return (
-    <div className={styles.featureItem}>
+    <div>
       <Icon role="img" className={styles.featureIcon} />
       <h3>{title}</h3>
       <p>{description}</p>
@@ -80,7 +88,7 @@ function Feature({ title, Icon, description }: FeatureItem) {
   );
 }
 
-export default function Home() {
+export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   const blurb =
     'MCAP (pronounced "em-cap") is an open source container file format for multimodal log data. ' +
@@ -101,7 +109,7 @@ export default function Home() {
             ></img>
           </div>
           <p className={styles.blurb}>{blurb}</p>
-          <div>
+          <div className={styles.heroButtons}>
             <Link className={styles.heroButtonPrimary} to="/guides">
               Get Started
             </Link>
@@ -121,6 +129,40 @@ export default function Home() {
           </div>
         </div>
       </div>
+
+      <div className={`${styles.section ?? ""} ${styles.logosSection ?? ""}`}>
+        <div className="container">
+          <h2 className={styles.logosHeader}>
+            Trusted by leading robotics teams
+          </h2>
+          <div className={styles.logoGrid}>
+            {icons.Logos.map(({ href, LightModeLogo, DarkModeLogo }, idx) => (
+              <a key={idx} href={href}>
+                <LightModeLogo
+                  role="img"
+                  className={`${styles.logoIcon ?? ""} ${
+                    styles.lightMode ?? ""
+                  }`}
+                />
+                <DarkModeLogo
+                  role="img"
+                  className={`${styles.logoIcon ?? ""} ${
+                    styles.darkMode ?? ""
+                  }`}
+                />
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <BrowserOnly>
+        {() => (
+          <Suspense fallback={""}>
+            <McapRecordingDemo />
+          </Suspense>
+        )}
+      </BrowserOnly>
     </Layout>
   );
 }
